@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>MVP Registro de Vehículos - Dos Caras</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; }
+        .campo { margin-bottom: 12px; }
+        label { display: block; font-weight: bold; margin-bottom: 4px; font-size: 14px; }
+        input { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { color: white; padding: 12px 20px; border: none; cursor: pointer; font-size: 15px; width: 100%; margin-bottom: 10px; }
+        #btnProcesar { background: #28a745; }
+        #btnDescargarRunt { background: #007bff; }
+        .seccion { margin-top: 25px; border-top: 1px solid #ccc; padding-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <h2>Cargar Tarjeta de Propiedad (Ambas Caras)</h2>
+    <div class="campo">
+        <label>Selecciona las 2 fotos (Frente y Respaldo):</label>
+        <input type="file" id="inputFotos" accept="image/*" multiple>
+    </div>
+    
+    <!-- BOTÓN 1: EXTRAER DATOS CON IA -->
+    <button id="btnProcesar" type="button">Extraer Información Completa</button>
+
+    <div class="seccion">
+        <h2>Información del Documento</h2>
+        <div class="campo"><label>Nro. Licencia de Tránsito:</label><input type="text" id="licencia_de_transito"></div>
+        <div class="campo"><label>Organismo de Tránsito:</label><input type="text" id="organismo_de_transito"></div>
+        <div class="campo"><label>Fecha de Matrícula:</label><input type="text" id="fecha_de_matricula"></div>
+        <div class="campo"><label>Fecha Expedición Licencia:</label><input type="text" id="fecha_expedicion_lic_transito"></div>
+    </div>
+
+    <div class="seccion">
+        <h2>Características Técnicas del Vehículo</h2>
+        <div class="campo"><label>Placa:</label>
+            <input type="text" id="placa_letras" style="width:48%; display:inline;" placeholder="Letras">
+            <input type="text" id="placa_numeros" style="width:48%; display:inline;" placeholder="Números">
+        </div>
+        <div class="campo"><label>Marca / Línea / Modelo:</label>
+            <input type="text" id="marca" style="width:30%; display:inline;" placeholder="Marca">
+            <input type="text" id="linea" style="width:35%; display:inline;" placeholder="Línea">
+            <input type="text" id="modelo" style="width:30%; display:inline;" placeholder="Modelo">
+        </div>
+        <div class="campo"><label>Clase de Vehículo:</label><input type="text" id="clase_de_vehiculo"></div>
+        <div class="campo"><label>Tipo de Carrocería:</label><input type="text" id="tipo_de_carroceria"></div>
+        <div class="campo"><label>Combustible:</label><input type="text" id="combustible"></div>
+        <div class="campo"><label>Capacidad (Kg/Psj):</label><input type="text" id="capacidad"></div>
+        <div class="campo"><label>Color:</label><input type="text" id="color"></div>
+        <div class="campo"><label>Cilindraje:</label><input type="text" id="cilindraje"></div>
+        <div class="campo"><label>Potencia:</label><input type="text" id="potencia"></div>
+        <div class="campo"><label>Servicio:</label><input type="text" id="servicio"></div>
+    </div>
+
+    <div class="seccion">
+        <h2>Identificación Serial</h2>
+        <div class="campo"><label>Número de Motor:</label><input type="text" id="numero_motor"></div>
+        <div class="campo"><label>Número VIN:</label><input type="text" id="numero_vin"></div>
+        <div class="campo"><label>Número de Serie:</label><input type="text" id="numero_serie"></div>
+        <div class="campo"><label>Número de Chasis:</label><input type="text" id="numero_chasis"></div>
+    </div>
+
+    <div class="seccion">
+        <h2>Datos del Propietario</h2>
+        <div class="campo"><label>Primer Apellido:</label><input type="text" id="propietario_primer_apellido"></div>
+        <div class="campo"><label>Segundo Apellido:</label><input type="text" id="propietario_segundo_apellido"></div>
+        <div class="campo"><label>Nombre(s):</label><input type="text" id="propietario_nombre"></div>
+        <div class="campo"><label>Tipo de Identificación:</label><input type="text" id="propietario_tipo_identificacion"></div>
+        <div class="campo"><label>Número de Identificación:</label><input type="text" id="propietario_numero_identificacion"></div>
+    </div>
+
+    <!-- BOTÓN 2: GENERAR FORMULARIO RUNT -->
+    <button id="btnDescargarRunt" type="button">Descargar Formulario RUNT</button>
+
+    <script>
+        // =========================================================================
+        // LÓGICA DEL BOTÓN 1: ENVIAR FOTOS AL BACKEND PARA EXTRAER CON GEMINI
+        // =========================================================================
+        document.getElementById('btnProcesar').addEventListener('click', async () => {
+            const archivos = document.getElementById('inputFotos').files;
+            if (archivos.length === 0) return alert('Por favor, selecciona al menos una foto.');
+
+            const formData = new FormData();
+            for (let i = 0; i < archivos.length; i++) {
+                formData.append('tarjeta', archivos[i]);
+            }
+
+            document.getElementById('btnProcesar').innerText = 'Analizando ambas caras...';
+            document.getElementById('btnProcesar').style.background = '#ffc107';
+
+            try {
+                const respuesta = await fetch('http://localhost:3000/api/extraer-tarjeta', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!respuesta.ok) throw new Error('Error en el servidor');
+                const datos = await respuesta.json();
+
+                // Llenado automático de los campos de control del documento
+                document.getElementById('licencia_de_transito').value = datos.licencia_de_transito || '';
+                document.getElementById('organismo_de_transito').value = datos.organismo_de_transito || '';
+                document.getElementById('fecha_de_matricula').value = datos.fecha_de_matricula || '';
+                document.getElementById('fecha_expedicion_lic_transito').value = datos.fecha_expedicion_lic_transito || '';
+
+                // Características del vehículo
+                document.getElementById('placa_letras').value = datos.placa_letras || '';
+                document.getElementById('placa_numeros').value = datos.placa_numeros || '';
+                document.getElementById('marca').value = datos.marca || '';
+                document.getElementById('linea').value = datos.linea || '';
+                document.getElementById('modelo').value = datos.modelo || '';
+                document.getElementById('clase_de_vehiculo').value = datos.clase_de_vehiculo || '';
+                document.getElementById('tipo_de_carroceria').value = datos.tipo_de_carroceria || '';
+                document.getElementById('combustible').value = datos.combustible || '';
+                document.getElementById('capacidad').value = datos.capacidad || '';
+                document.getElementById('color').value = datos.color || '';
+                document.getElementById('cilindraje').value = datos.cilindraje || '';
+                document.getElementById('potencia').value = datos.potencia || '';
+                document.getElementById('servicio').value = datos.servicio || '';
+
+                // Números seriales
+                document.getElementById('numero_motor').value = datos.numero_motor || '';
+                document.getElementById('numero_vin').value = datos.numero_vin || '';
+                document.getElementById('numero_serie').value = datos.numero_serie || '';
+                document.getElementById('numero_chasis').value = datos.numero_chasis || '';
+
+                // Propietario
+                document.getElementById('propietario_primer_apellido').value = datos.propietario_primer_apellido || '';
+                document.getElementById('propietario_segundo_apellido').value = datos.propietario_segundo_apellido || '';
+                document.getElementById('propietario_nombre').value = datos.propietario_nombre || '';
+                document.getElementById('propietario_tipo_identificacion').value = datos.propietario_tipo_identificacion || '';
+                document.getElementById('propietario_numero_identificacion').value = datos.propietario_numero_identificacion || '';
+
+            } catch (error) {
+                alert('Ocurrió un error al extraer los datos de las imágenes.');
+            } finally {
+                document.getElementById('btnProcesar').innerText = 'Extraer Información Completa';
+                document.getElementById('btnProcesar').style.background = '#28a745';
+            }
+        });
+
+        // =========================================================================
+        // LÓGICA DEL BOTÓN 2: TOMAR LOS CAMPOS DEL FORMULARIO Y BAJAR EL RUNT
+        // =========================================================================
+        document.getElementById('btnDescargarRunt').addEventListener('click', async () => {
+            const datosParaEnviar = {
+                // El formulario RUNT recibe e imprime la placa como un solo valor.
+                placa: `${document.getElementById('placa_letras').value}${document.getElementById('placa_numeros').value}`.replace(/\s+/g, ''),
+                marca: document.getElementById('marca').value,
+                linea: document.getElementById('linea').value,
+                modelo: document.getElementById('modelo').value,
+                clase_de_vehiculo: document.getElementById('clase_de_vehiculo').value,
+                tipo_de_carroceria: document.getElementById('tipo_de_carroceria').value,
+                combustible: document.getElementById('combustible').value,
+                capacidad: document.getElementById('capacidad').value,
+                color: document.getElementById('color').value,
+                cilindraje: document.getElementById('cilindraje').value,
+                potencia: document.getElementById('potencia').value,
+                servicio: document.getElementById('servicio').value,
+                numero_motor: document.getElementById('numero_motor').value,
+                numero_vin: document.getElementById('numero_vin').value,
+                numero_serie: document.getElementById('numero_serie').value,
+                numero_chasis: document.getElementById('numero_chasis').value,
+                organismo_de_transito: document.getElementById('organismo_de_transito').value,
+                propietario_primer_apellido: document.getElementById('propietario_primer_apellido').value,
+                propietario_segundo_apellido: document.getElementById('propietario_segundo_apellido').value,
+                propietario_nombre: document.getElementById('propietario_nombre').value,
+                propietario_tipo_identificacion: document.getElementById('propietario_tipo_identificacion').value,
+                propietario_numero_identificacion: document.getElementById('propietario_numero_identificacion').value
+            };
+
+            try {
+                const respuesta = await fetch('http://localhost:3000/api/descargar-runt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datosParaEnviar)
+                });
+
+                if (!respuesta.ok) throw new Error('Error al generar el PDF del RUNT');
+
+                const blob = await respuesta.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'formulario_runt_diligenciado.pdf';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                
+            } catch (error) {
+                alert('No se pudo procesar la descarga del formulario RUNT.');
+            }
+        });
+    </script>
+</body>
+</html>

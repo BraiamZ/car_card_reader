@@ -1,0 +1,6 @@
+1. Se debe configurar el documento y verificar la marcacion de las casillas al momento de diligencias.
+Saber que formatos se llenan https://www.pdfescape.com/ Con la opcion desmarcada de visible no uqeda el campo a diligencia con sombra.
+2. Se extrajo el proceso de cobro y de montar aplicacion. 
+Al agregar bases de datos y PDFs, los costos se mantienen increíblemente bajos porque sigues aprovechando las capas gratuitas de los proveedores líderes:Servicio / FunciónProveedor SugeridoCosto Mensual (Capa de Pago)Notas sobre Capa GratuitaHosting Frontend + BackendVercel$0.00 USDPermite hasta 100 GB de ancho de banda. Tus PDFs consumirán cerca de 2 GB al mes.Inteligencia Artificial (OCR)Gemini 3.6 Flash~$0.15 USD (~$600 COP)El único costo real si decides activar la privacidad estricta de datos (Pay-as-you-go).Base de Datos (Texto Plano)Supabase$0.00 USDGratuito hasta 500 MB. Consumirás apenas ~2 MB al mes con 900 registros.Generación de PDFsNode.js (pdfkit)$0.00 USDSe ejecuta dentro del tiempo de cómputo gratuito de Vercel.Costo Mensual Total Estimado~$0.15 USD (~$600 COP)¡Tu aplicación completa opera con menos de mil pesos colombianos al mes!
+
+Probar webscrapping.

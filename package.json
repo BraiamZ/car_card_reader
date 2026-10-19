@@ -1,0 +1,17 @@
+{
+  "name": "mvp-ocr-colombia",
+  "version": "1.0.0",
+  "description": "MVP para extraer datos de tarjetas de propiedad colombianas usando Gemini API",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@google/genai": "latest",
+    "cors": "^2.8.6",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.1",
+    "pdf-lib": "^1.17.1"
+  }
+}
